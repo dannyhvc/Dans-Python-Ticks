@@ -58,29 +58,27 @@ def scanner(pattern: re.Pattern, input_text: str) -> list[str or int or float]:
 def execute(tokens: list[str or int or float]) -> int or float:
     value_stack = deque()
     operation_queue = deque()
-    ops_swither = {
-        'add': add,
-        'sub': sub,
-        'mul': mul,
-        'div': div,
-    }
+    ops_swither = {'add': add, 'sub': sub, 'mul': mul, 'div': div}
 
+    # parsing
     i = 0
     while i < len(tokens):
-        if tokens[i] == 'push':
-            value_stack.appendleft(tokens[i+1])
-            i += 1
-        elif tokens[i] == 'pop':
-            value_stack.pop(tokens[i+1])
-            i += 1
-        elif tokens[i] == 'start':
-            pass
-        elif tokens[i] in ops_swither:
-            operation_queue.appendleft(ops_swither[tokens[i]])
-        else:
-            break
+        match tokens[i]:
+            case "push":
+                value_stack.appendleft(tokens[i+1])
+                i += 1
+            case 'pop':
+                value_stack.pop(tokens[i+1])
+                i += 1
+            case 'start':
+                pass
+            case 'end':
+                break
+            case 'add' | 'sub' | 'mul' | 'div':
+                operation_queue.appendleft(ops_swither[tokens[i]])
         i += 1
 
+    # execution
     for op in operation_queue:
         op(value_stack)
     return value_stack.pop()
